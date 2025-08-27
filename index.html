@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio Interactivo: Ciclos de Repetición en Python</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Alchemist's Study (Warm neutrals like beige/tan, dark slate text, muted gold and blue accents) -->
+    <!-- Application Structure Plan: A thematic, single-page vertical scroll application. Sections include: 1. Hero Introduction, 2. Interactive Key Concepts (Anatomy of a Loop), 3. Tabbed Deep Dive on 'while' vs 'for' loops with mini-simulators, 4. A full interactive 'Alchemist's Lab' simulator with a resource dashboard and a dynamic Chart.js visualization, 5. The formal Lab Activity details. This structure transforms a static document into an engaging, multi-layered learning path, from theory to interactive practice, which is more effective for student understanding than a linear text. -->
+    <!-- Visualization & Content Choices: 1. Loop Anatomy -> Goal: Organize -> Method: Interactive HTML/CSS diagram -> Interaction: Hover/click for details -> Justification: Visual reinforcement of core theory. 2. Alchemist Resources -> Goal: Show Change -> Method: Multi-line chart -> Interaction: Dynamic updates on user action -> Justification: Visually connects user choices (loop iterations) to state changes. -> Library: Chart.js. 3. Code Snippets -> Goal: Inform -> Method: Styled code blocks with mini-simulators -> Interaction: Run code, see output -> Justification: Promotes active learning over passive reading. -> Library: Vanilla JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF6;
+            color: #3a3a3a;
+        }
+        h1, h2, h3 {
+            font-family: 'Merriweather', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .glass-pane {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link:hover {
+            color: #C0A062;
+            border-color: #C0A062;
+        }
+        .tab-btn.active {
+            background-color: #4A5568;
+            color: #FDFBF6;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-gray-800">Laboratorio de Ciclos</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#intro" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Introducción</a>
+                <a href="#conceptos" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Conceptos</a>
+                <a href="#tipos" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Tipos de Ciclos</a>
+                <a href="#simulador" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Simulador</a>
+                <a href="#actividad" class="nav-link text-gray-600 border-b-2 border-transparent pb-1">Actividad</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="intro" class="py-20 bg-amber-50">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-gray-800 mb-4">Dominando los Ciclos de Repetición</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                    La programación es el arte de la automatización. Los ciclos son el corazón de este poder, permitiéndonos realizar miles de tareas con unas pocas líneas de código. Pensemos en lavar 100 platos: no pensamos en 100 acciones, sino en un proceso que se repite. Eso es un ciclo.
+                </p>
+            </div>
+        </section>
+
+        <section id="conceptos" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Anatomía de un Ciclo</h2>
+                <p class="text-center max-w-2xl mx-auto mb-12 text-gray-600">
+                    Para que un ciclo funcione correctamente, necesita tres ingredientes clave que trabajan en armonía. Un fallo en cualquiera de ellos puede llevar a resultados inesperados o a los temidos bucles infinitos. Explora cada componente para entender su rol fundamental.
+                </p>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-8 text-center">
+                    <div class="p-6 bg-white rounded-lg shadow-lg w-64">
+                        <div class="text-5xl mb-4">1️⃣</div>
+                        <h3 class="text-xl font-bold mb-2">Inicialización</h3>
+                        <p class="text-gray-600">Preparar el escenario. Aquí se da un valor inicial a la variable que controlará el ciclo. Ej: `contador = 0`.</p>
+                    </div>
+                    <div class="text-4xl text-gray-400 hidden md:block">➡️</div>
+                    <div class="p-6 bg-white rounded-lg shadow-lg w-64">
+                        <div class="text-5xl mb-4">2️⃣</div>
+                        <h3 class="text-xl font-bold mb-2">Condición</h3>
+                        <p class="text-gray-600">La puerta de control. Una pregunta (booleana) que se hace en cada vuelta. Si es `True`, continuamos. Si es `False`, paramos.</p>
+                    </div>
+                    <div class="text-4xl text-gray-400 hidden md:block">🔄</div>
+                    <div class="p-6 bg-white rounded-lg shadow-lg w-64">
+                        <div class="text-5xl mb-4">3️⃣</div>
+                        <h3 class="text-xl font-bold mb-2">Actualización</h3>
+                        <p class="text-gray-600">El motor del progreso. Modificamos la variable de control para acercarnos al punto en que la condición sea `False`.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tipos" class="py-20 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">`while` vs. `for`: La Herramienta Correcta</h2>
+                 <p class="text-center max-w-3xl mx-auto mb-12 text-gray-600">
+                    Python nos ofrece dos tipos principales de ciclos, cada uno diseñado para un propósito específico. La clave para un código limpio y eficiente es saber cuándo usar cada uno. `for` es ideal para recorridos predecibles, mientras que `while` brilla en la incertidumbre.
+                </p>
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-center mb-8 border-b">
+                        <button id="tab-while-btn" class="tab-btn py-2 px-6 text-lg font-medium text-gray-600 focus:outline-none active">Ciclo `while`</button>
+                        <button id="tab-for-btn" class="tab-btn py-2 px-6 text-lg font-medium text-gray-600 focus:outline-none">Ciclo `for`</button>
+                    </div>
+                    <div id="tab-while-content">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold mb-4">Iteración Indefinida</h3>
+                                <p class="mb-4 text-gray-700">Usa `while` cuando no sepas cuántas veces se debe repetir el ciclo. Se ejecutará "mientras" una condición sea verdadera. Es perfecto para menús interactivos, validación de entradas o esperar un evento.</p>
+                                <div class="bg-gray-800 text-white p-4 rounded-md font-mono text-sm">
+                                    <p><span class="text-purple-400">contador</span> = <span class="text-green-400">1</span></p>
+                                    <p><span class="text-blue-400">while</span> contador <= <span class="text-green-400">5</span>:</p>
+                                    <p class="ml-4"><span class="text-yellow-300">print</span>(contador)</p>
+                                    <p class="ml-4">contador += <span class="text-green-400">1</span></p>
+                                </div>
+                                <div class="mt-4 p-4 border-l-4 border-red-500 bg-red-100 text-red-800">
+                                    <h4 class="font-bold">¡Cuidado!</h4>
+                                    <p>Si olvidas la línea de actualización (`contador += 1`), crearás un bucle infinito, ¡un error común que congela tu programa!</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <h4 class="font-bold text-lg mb-2">Mini-Simulador `while`</h4>
+                                <p class="text-sm mb-4 text-gray-600">Presiona "Ejecutar" para ver un ciclo `while` contar hasta 5.</p>
+                                <button id="run-while-sim" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition">Ejecutar</button>
+                                <div id="while-sim-output" class="mt-4 p-2 h-32 bg-gray-900 text-white font-mono text-sm rounded-md overflow-y-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-for-content" class="hidden">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold mb-4">Iteración Definida</h3>
+                                <p class="mb-4 text-gray-700">Usa `for` cuando quieras recorrer los elementos de una colección (como una lista o una cadena) o cuando sepas exactamente cuántas veces repetir una acción, usando la función `range()`.</p>
+                                <div class="bg-gray-800 text-white p-4 rounded-md font-mono text-sm">
+                                    <p><span class="text-purple-400">frutas</span> = [<span class="text-yellow-300">"manzana"</span>, <span class="text-yellow-300">"pera"</span>, <span class="text-yellow-300">"uva"</span>]</p>
+                                    <p><span class="text-blue-400">for</span> fruta <span class="text-blue-400">in</span> frutas:</p>
+                                    <p class="ml-4"><span class="text-yellow-300">print</span>(fruta)</p>
+                                </div>
+                                <div class="mt-4 p-4 border-l-4 border-green-500 bg-green-100 text-green-800">
+                                    <h4 class="font-bold">Práctica "Pythonica"</h4>
+                                    <p>En Python, se prefiere el ciclo `for` siempre que sea posible. Es más legible, conciso y seguro contra bucles infinitos.</p>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-lg shadow">
+                                <h4 class="font-bold text-lg mb-2">Mini-Simulador `for`</h4>
+                                <p class="text-sm mb-4 text-gray-600">Presiona "Ejecutar" para ver un ciclo `for` recorrer una lista de frutas.</p>
+                                <button id="run-for-sim" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition">Ejecutar</button>
+                                <div id="for-sim-output" class="mt-4 p-2 h-32 bg-gray-900 text-white font-mono text-sm rounded-md overflow-y-auto"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="simulador" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Simulador: El Laboratorio del Alquimista</h2>
+                <p class="text-center max-w-3xl mx-auto mb-12 text-gray-600">
+                    ¡Es hora de poner la teoría en práctica! Este simulador interactivo representa el ejercicio de la guía. Cada acción que tomas es una iteración de un gran ciclo `while` que controla el juego. Observa cómo los recursos cambian en el tiempo y cómo se gestionan los contadores internos, como los días de calentamiento. Tu objetivo: crear 5 unidades de oro.
+                </p>
+
+                <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl p-4 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 order-2 lg:order-1">
+                        <h3 class="text-2xl font-bold mb-4">Panel de Control</h3>
+                        <div id="game-controls">
+                            <p class="mb-4 text-gray-600">Elige tu acción para el día <span id="dia-actual" class="font-bold">1</span>.</p>
+                            <div class="space-y-3">
+                                <button data-action="calentar" class="game-action-btn w-full text-left flex items-center space-x-3 p-3 bg-orange-100 hover:bg-orange-200 rounded-lg transition">
+                                    <span class="text-2xl">🔥</span>
+                                    <div>
+                                        <p class="font-bold text-orange-800">Calentar</p>
+                                        <p class="text-sm text-orange-700">Purifica plomo. 3 días seguidos lo transmutan en mercurio.</p>
+                                    </div>
+                                </button>
+                                <button data-action="mezclar" class="game-action-btn w-full text-left flex items-center space-x-3 p-3 bg-blue-100 hover:bg-blue-200 rounded-lg transition">
+                                    <span class="text-2xl">🧪</span>
+                                    <div>
+                                        <p class="font-bold text-blue-800">Mezclar</p>
+                                        <p class="text-sm text-blue-700">Convierte 2 de mercurio en 5 de azufre.</p>
+                                    </div>
+                                </button>
+                                <button data-action="catalizar" class="game-action-btn w-full text-left flex items-center space-x-3 p-3 bg-purple-100 hover:bg-purple-200 rounded-lg transition">
+                                    <span class="text-2xl">✨</span>
+                                    <div>
+                                        <p class="font-bold text-purple-800">Catalizar</p>
+                                        <p class="text-sm text-purple-700">Usa 15 azufre y 25 plomo para crear 1 de oro.</p>
+                                    </div>
+                                </button>
+                            </div>
+                            <button id="reset-sim" class="mt-6 w-full bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition">Reiniciar Simulación</button>
+                        </div>
+                        <div id="game-over-message" class="hidden text-center p-6 bg-gray-100 rounded-lg">
+                            <h4 class="text-2xl font-bold mb-2"></h4>
+                            <p class="mb-4"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-2 order-1 lg:order-2">
+                        <h3 class="text-2xl font-bold mb-4">Estado de Recursos</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 text-center">
+                            <div class="bg-gray-100 p-3 rounded-lg">
+                                <p class="text-sm text-gray-500">Plomo</p>
+                                <p id="plomo-val" class="text-2xl font-bold">100</p>
+                            </div>
+                            <div class="bg-cyan-50 p-3 rounded-lg">
+                                <p class="text-sm text-cyan-600">Mercurio</p>
+                                <p id="mercurio-val" class="text-2xl font-bold text-cyan-800">0</p>
+                            </div>
+                            <div class="bg-yellow-50 p-3 rounded-lg">
+                                <p class="text-sm text-yellow-600">Azufre</p>
+                                <p id="azufre-val" class="text-2xl font-bold text-yellow-800">0</p>
+                            </div>
+                            <div class="bg-amber-100 p-3 rounded-lg col-span-2 md:col-span-1">
+                                <p class="text-sm text-amber-600">Oro</p>
+                                <p id="oro-val" class="text-2xl font-bold text-amber-800">0 / 5</p>
+                            </div>
+                             <div class="bg-indigo-50 p-3 rounded-lg">
+                                <p class="text-sm text-indigo-600">Calentando</p>
+                                <p id="calentando-val" class="text-2xl font-bold text-indigo-800">0/3 días</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h4 class="font-bold text-lg mb-2">Progreso de Transmutación</h4>
+                             <div class="chart-container">
+                                <canvas id="resourceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">Bitácora del Laboratorio</h4>
+                            <div id="game-log" class="h-40 bg-gray-900 text-white font-mono text-xs p-3 rounded-md overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="actividad" class="py-20 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Actividad de Trabajo Autónomo</h2>
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4">Simulación: El Laboratorio del Alquimista</h3>
+                    <p class="mb-6 text-gray-700">Tu tarea es programar en Python la simulación que acabas de probar. Deberás gestionar los recursos y las reglas del proceso a lo largo de varios "días" (iteraciones), aplicando todo lo aprendido sobre ciclos.</p>
+                    
+                    <div class="space-y-4 mb-6">
+                        <details class="bg-gray-50 p-4 rounded-lg">
+                            <summary class="font-bold cursor-pointer">Estado Inicial y Reglas del Proceso</summary>
+                            <div class="mt-4 prose max-w-none">
+                                <p><strong>Recursos Iniciales:</strong></p>
+                                <ul>
+                                    <li><code>plomo = 100</code></li>
+                                    <li><code>mercurio = 0</code></li>
+                                    <li><code>azufre = 0</code></li>
+                                    <li><code>oro = 0</code></li>
+                                    <li><code>dia = 1</code></li>
+                                </ul>
+                                <p>El programa se ejecuta en un ciclo <code>while</code> mientras tengas plomo y no hayas alcanzado 5 de oro. Cada día, muestra el estado y pide una acción: <code>calentar</code>, <code>mezclar</code>, o <code>catalizar</code>.</p>
+                            </div>
+                        </details>
+                        <details class="bg-gray-50 p-4 rounded-lg">
+                            <summary class="font-bold cursor-pointer">Detalle de Acciones y Lógica</summary>
+                             <div class="mt-4 prose max-w-none">
+                                <ol>
+                                    <li><strong>Acción `calentar`:</strong> Requiere 3 días de calentamiento <strong>consecutivos</strong> para convertir 10 de plomo en 1 de mercurio. Un contador debe llevar la cuenta y reiniciarse si se elige otra acción.</li>
+                                    <li><strong>Acción `mezclar`:</strong> Requiere 2 de mercurio para producir 5 de azufre.</li>
+                                    <li><strong>Acción `catalizar`:</strong> Requiere 15 de azufre y 25 de plomo para producir 1 de oro.</li>
+                                    <li><strong>El Toque Especial (Evento Cósmico):</strong> Cada 7 días (7, 14, 21...), antes de la acción del usuario, ocurre un evento aleatorio que reduce una pequeña cantidad de un recurso. Debes usar el módulo <code>random</code>.</li>
+                                </ol>
+                            </div>
+                        </details>
+                        <details class="bg-gray-50 p-4 rounded-lg">
+                            <summary class="font-bold cursor-pointer">Comprobación y Entrega</summary>
+                            <div class="mt-4 prose max-w-none">
+                                <p>Para la entrega, crearás un "Diario de Laboratorio del Alquimista" en una carpeta de OneDrive. Deberás incluir:</p>
+                                <ol>
+                                    <li><strong><code>alquimista.py</code></strong>: Tu código fuente completo.</li>
+                                    <li><strong><code>bitacora_transmutacion.txt</code></strong>: Un archivo de texto generado por tu programa con el registro de una partida exitosa.</li>
+                                    <li><strong><code>reflexion_filosofal.md</code></strong>: Un archivo Markdown con un diagrama de flujo o pseudocódigo explicando la lógica para el contador de calentamiento consecutivo y el evento cósmico.</li>
+                                </ol>
+                                <p><strong>Importante:</strong> El enlace de OneDrive debe ser público para que cualquiera con el link pueda acceder.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Laboratorio de Lógica de Programación. Una aplicación interactiva de aprendizaje.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const tabWhileBtn = document.getElementById('tab-while-btn');
+            const tabForBtn = document.getElementById('tab-for-btn');
+            const tabWhileContent = document.getElementById('tab-while-content');
+            const tabForContent = document.getElementById('tab-for-content');
+
+            tabWhileBtn.addEventListener('click', () => {
+                tabWhileBtn.classList.add('active');
+                tabForBtn.classList.remove('active');
+                tabWhileContent.classList.remove('hidden');
+                tabForContent.classList.add('hidden');
+            });
+
+            tabForBtn.addEventListener('click', () => {
+                tabForBtn.classList.add('active');
+                tabWhileBtn.classList.remove('active');
+                tabForContent.classList.remove('hidden');
+                tabWhileContent.classList.add('hidden');
+            });
+
+            const runWhileSimBtn = document.getElementById('run-while-sim');
+            const whileSimOutput = document.getElementById('while-sim-output');
+            runWhileSimBtn.addEventListener('click', () => {
+                whileSimOutput.innerHTML = '';
+                let contador = 1;
+                const interval = setInterval(() => {
+                    if (contador <= 5) {
+                        whileSimOutput.innerHTML += `> Imprimiendo: ${contador}\n`;
+                        whileSimOutput.scrollTop = whileSimOutput.scrollHeight;
+                        contador++;
+                    } else {
+                        whileSimOutput.innerHTML += `> Ciclo terminado.\n`;
+                        whileSimOutput.scrollTop = whileSimOutput.scrollHeight;
+                        clearInterval(interval);
+                    }
+                }, 500);
+            });
+
+            const runForSimBtn = document.getElementById('run-for-sim');
+            const forSimOutput = document.getElementById('for-sim-output');
+            runForSimBtn.addEventListener('click', () => {
+                forSimOutput.innerHTML = '';
+                const frutas = ["manzana", "pera", "uva"];
+                let i = 0;
+                const interval = setInterval(() => {
+                    if (i < frutas.length) {
+                        forSimOutput.innerHTML += `> Recorriendo: ${frutas[i]}\n`;
+                        forSimOutput.scrollTop = forSimOutput.scrollHeight;
+                        i++;
+                    } else {
+                        forSimOutput.innerHTML += `> Ciclo terminado.\n`;
+                        forSimOutput.scrollTop = forSimOutput.scrollHeight;
+                        clearInterval(interval);
+                    }
+                }, 500);
+            });
+
+            let gameState = {};
+            const gameLog = document.getElementById('game-log');
+            const resourceChartCanvas = document.getElementById('resourceChart').getContext('2d');
+            let resourceChart;
+
+            function initChart() {
+                if (resourceChart) {
+                    resourceChart.destroy();
+                }
+                resourceChart = new Chart(resourceChartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: ['Día 0'],
+                        datasets: [
+                            { label: 'Plomo', data: [100], borderColor: 'rgb(107, 114, 128)', backgroundColor: 'rgba(107, 114, 128, 0.5)', tension: 0.1 },
+                            { label: 'Mercurio', data: [0], borderColor: 'rgb(6, 182, 212)', backgroundColor: 'rgba(6, 182, 212, 0.5)', tension: 0.1 },
+                            { label: 'Azufre', data: [0], borderColor: 'rgb(234, 179, 8)', backgroundColor: 'rgba(234, 179, 8, 0.5)', tension: 0.1 },
+                            { label: 'Oro', data: [0], borderColor: 'rgb(217, 119, 6)', backgroundColor: 'rgba(217, 119, 6, 0.5)', tension: 0.1 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }
+
+            function updateChart() {
+                resourceChart.data.labels.push(`Día ${gameState.dia}`);
+                resourceChart.data.datasets[0].data.push(gameState.plomo);
+                resourceChart.data.datasets[1].data.push(gameState.mercurio);
+                resourceChart.data.datasets[2].data.push(gameState.azufre);
+                resourceChart.data.datasets[3].data.push(gameState.oro);
+                resourceChart.update();
+            }
+            
+            function addLog(message, type = 'info') {
+                const colors = {
+                    info: 'text-gray-300',
+                    success: 'text-green-400',
+                    error: 'text-red-400',
+                    event: 'text-yellow-400'
+                };
+                gameLog.innerHTML += `<p class="${colors[type]}">> Día ${gameState.dia}: ${message}</p>`;
+                gameLog.scrollTop = gameLog.scrollHeight;
+            }
+
+            function updateUI() {
+                document.getElementById('dia-actual').textContent = gameState.dia;
+                document.getElementById('plomo-val').textContent = gameState.plomo;
+                document.getElementById('mercurio-val').textContent = gameState.mercurio;
+                document.getElementById('azufre-val').textContent = gameState.azufre;
+                document.getElementById('oro-val').textContent = `${gameState.oro} / 5`;
+                document.getElementById('calentando-val').textContent = `${gameState.diasCalentando} / 3 días`;
+            }
+
+            function checkGameOver() {
+                if (gameState.oro >= 5) {
+                    endGame(true, "¡Transmutación exitosa! Has creado 5 unidades de oro.");
+                    return true;
+                }
+                if (gameState.plomo <= 0) {
+                    endGame(false, "¡Fracaso! Te has quedado sin plomo, el ingrediente esencial.");
+                    return true;
+                }
+                return false;
+            }
+
+            function endGame(isVictory, message) {
+                document.getElementById('game-controls').classList.add('hidden');
+                const gameOverMessage = document.getElementById('game-over-message');
+                gameOverMessage.querySelector('h4').textContent = isVictory ? '¡Victoria!' : 'Fin del Juego';
+                gameOverMessage.querySelector('p').textContent = message;
+                gameOverMessage.classList.remove('hidden');
+            }
+
+            function handleAction(action) {
+                if (checkGameOver()) return;
+
+                let actionTaken = false;
+
+                if ((gameState.dia % 7) === 0) {
+                    const resources = ['plomo', 'mercurio', 'azufre'];
+                    const affectedResource = resources[Math.floor(Math.random() * resources.length)];
+                    const amountLost = Math.floor(Math.random() * 5) + 1;
+                    if (gameState[affectedResource] > 0) {
+                        gameState[affectedResource] = Math.max(0, gameState[affectedResource] - amountLost);
+                        addLog(`¡Evento cósmico! Se pierden ${amountLost} de ${affectedResource}.`, 'event');
+                    }
+                }
+
+                switch (action) {
+                    case 'calentar':
+                        gameState.diasCalentando++;
+                        addLog(`Calentando el plomo. Días consecutivos: ${gameState.diasCalentando}.`);
+                        if (gameState.diasCalentando >= 3) {
+                            if (gameState.plomo >= 10) {
+                                gameState.plomo -= 10;
+                                gameState.mercurio += 1;
+                                addLog(`¡Purificación completa! +1 vial de mercurio.`, 'success');
+                                gameState.diasCalentando = 0;
+                            } else {
+                                addLog(`No hay suficiente plomo para transmutar.`, 'error');
+                            }
+                        }
+                        actionTaken = true;
+                        break;
+                    case 'mezclar':
+                        gameState.diasCalentando = 0;
+                        if (gameState.mercurio >= 2) {
+                            gameState.mercurio -= 2;
+                            gameState.azufre += 5;
+                            addLog(`Mezcla exitosa. +5 gramos de azufre.`, 'success');
+                        } else {
+                            addLog(`No hay suficiente mercurio para mezclar.`, 'error');
+                        }
+                        actionTaken = true;
+                        break;
+                    case 'catalizar':
+                        gameState.diasCalentando = 0;
+                        if (gameState.azufre >= 15 && gameState.plomo >= 25) {
+                            gameState.azufre -= 15;
+                            gameState.plomo -= 25;
+                            gameState.oro += 1;
+                            addLog(`¡CATALIZACIÓN EXITOSA! +1 unidad de ORO.`, 'success');
+                        } else {
+                            addLog(`Recursos insuficientes para catalizar.`, 'error');
+                        }
+                        actionTaken = true;
+                        break;
+                }
+
+                if (actionTaken) {
+                    updateChart();
+                    gameState.dia++;
+                    updateUI();
+                    checkGameOver();
+                }
+            }
+            
+            function resetSim() {
+                gameState = {
+                    plomo: 100, mercurio: 0, azufre: 0, oro: 0, dia: 1, diasCalentando: 0
+                };
+                gameLog.innerHTML = '';
+                document.getElementById('game-controls').classList.remove('hidden');
+                document.getElementById('game-over-message').classList.add('hidden');
+                addLog('Simulación iniciada. ¡Buena suerte, alquimista!');
+                initChart();
+                updateUI();
+            }
+
+            document.querySelectorAll('.game-action-btn').forEach(button => {
+                button.addEventListener('click', () => handleAction(button.dataset.action));
+            });
+            
+            document.getElementById('reset-sim').addEventListener('click', resetSim);
+
+            resetSim();
+        });
+    </script>
+</body>
+</html>
